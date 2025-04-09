@@ -1,0 +1,8 @@
+Flask==3.0.2
+ultralytics==8.1.27
+torch==2.2.0
+opencv-python==4.9.0.80
+fpdf==2.7.6
+Flask-Mail==0.9.1
+Werkzeug==3.0.1
+python-dotenv==1.0.1

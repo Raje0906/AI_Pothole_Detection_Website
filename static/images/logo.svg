@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <!-- Main Circle -->
+    <circle cx="50" cy="50" r="48" fill="#0D6EFD"/>
+    
+    <!-- Smart Road Design -->
+    <g transform="translate(50,50)">
+        <!-- Outer Ring (Rotating Scanner) -->
+        <circle cx="0" cy="0" r="40" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="4,4">
+            <animateTransform
+                attributeName="transform"
+                type="rotate"
+                from="0"
+                to="360"
+                dur="10s"
+                repeatCount="indefinite"
+            />
+        </circle>
+        
+        <!-- Road Surface (3D Effect) -->
+        <path d="M-30,10 L30,10 L20,-10 L-20,-10 Z" fill="#2B3035"/>
+        
+        <!-- Pothole with Glow Effect -->
+        <circle cx="0" cy="0" r="8" fill="#2B3035">
+            <animate
+                attributeName="opacity"
+                values="1;0.5;1"
+                dur="2s"
+                repeatCount="indefinite"
+            />
+        </circle>
+        
+        <!-- Scanner Lines -->
+        <g>
+            <!-- Horizontal Scanner -->
+            <line x1="-25" y1="0" x2="25" y2="0" stroke="white" stroke-width="0.5">
+                <animate
+                    attributeName="y1"
+                    values="-10;10;-10"
+                    dur="2s"
+                    repeatCount="indefinite"
+                />
+                <animate
+                    attributeName="y2"
+                    values="-10;10;-10"
+                    dur="2s"
+                    repeatCount="indefinite"
+                />
+            </line>
+            
+            <!-- Vertical Scanner -->
+            <line y1="-25" x1="0" y2="25" x2="0" stroke="white" stroke-width="0.5">
+                <animate
+                    attributeName="x1"
+                    values="-10;10;-10"
+                    dur="2s"
+                    repeatCount="indefinite"
+                />
+                <animate
+                    attributeName="x2"
+                    values="-10;10;-10"
+                    dur="2s"
+                    repeatCount="indefinite"
+                />
+            </line>
+        </g>
+        
+        <!-- AI Circuit Pattern -->
+        <g stroke="white" stroke-width="0.5" fill="none">
+            <path d="M-35,-35 L-25,-35 L-25,-25">
+                <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M35,-35 L25,-35 L25,-25">
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M-35,35 L-25,35 L-25,25">
+                <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+            <path d="M35,35 L25,35 L25,25">
+                <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite"/>
+            </path>
+        </g>
+        
+        <!-- Detection Points -->
+        <g fill="white">
+            <circle cx="-15" cy="-15" r="1">
+                <animate attributeName="r" values="1;2;1" dur="1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="15" cy="-15" r="1">
+                <animate attributeName="r" values="2;1;2" dur="1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="15" cy="15" r="1">
+                <animate attributeName="r" values="1;2;1" dur="1s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="-15" cy="15" r="1">
+                <animate attributeName="r" values="2;1;2" dur="1s" repeatCount="indefinite"/>
+            </circle>
+        </g>
+    </g>
+    
+    <!-- Yellow Road Lines -->
+    <g transform="translate(50,50)">
+        <rect x="-15" y="-2" width="8" height="2" fill="#FFC107" transform="rotate(-10)"/>
+        <rect x="7" y="-2" width="8" height="2" fill="#FFC107" transform="rotate(-10)"/>
+    </g>
+</svg>

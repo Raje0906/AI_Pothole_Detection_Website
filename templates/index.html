@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AI Pothole Detection System</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container-fluid px-2">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-road me-1"></i>Pothole Detection
+            </a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fas fa-home me-1"></i>Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard"><i class="fas fa-chart-bar me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/history"><i class="fas fa-history me-1"></i>History</a>
+                    </li>
+                </ul>
+                <div class="ms-auto">
+                    {% if session['email'] %}
+                        <span class="text-white me-2 d-none d-md-inline">{{ session['email'] }}</span>
+                        <a href="{{ url_for('logout') }}" class="btn btn-outline-light btn-sm"><i class="fas fa-sign-out-alt me-1"></i>Logout</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-sm"><i class="fas fa-sign-in-alt me-1"></i>Login</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-2 py-md-3">
+        <div class="row justify-content-center g-2">
+            <div class="col-12 col-md-10 col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-3">
+                        <h2 class="text-center mb-3">Upload Image or Video</h2>
+                        
+                        <form action="/" method="post" enctype="multipart/form-data" id="uploadForm" class="text-center">
+                            <div class="upload-area mb-3" id="dropZone">
+                                <input type="file" id="fileInput" name="file" class="d-none" accept="image/*,video/*" capture="environment">
+                                <div class="upload-content">
+                                    <i class="fas fa-cloud-upload-alt mb-2 text-primary"></i>
+                                    <h4 class="mb-1">Drag & Drop or Click to Upload</h4>
+                                    <p class="text-muted small mb-0">Supported: JPG, PNG, MP4, AVI</p>
+                                </div>
+                            </div>
+                            
+                            <div id="preview" class="mb-3 d-none">
+                                <div class="position-relative d-inline-block">
+                                    <img id="imagePreview" class="img-fluid rounded shadow-sm" alt="Preview">
+                                    <button type="button" class="btn btn-outline-danger btn-sm position-absolute top-0 end-0 m-2 p-1" id="removeFile">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                                <i class="fas fa-search me-1"></i>Detect Potholes
+                            </button>
+                        </form>
+
+                        <div id="loading" class="text-center d-none my-3">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2 small">Processing your image...</p>
+                        </div>
+
+                        {% if detection_message %}
+                        <div class="alert {% if 'No Pothole Found' in detection_message %}alert-success{% else %}alert-warning{% endif %} mt-3">
+                            <i class="fas {% if 'No Pothole Found' in detection_message %}fa-check-circle{% else %}fa-exclamation-triangle{% endif %} me-1"></i>
+                            {{ detection_message }}
+                        </div>
+                        {% endif %}
+
+                        {% if detected_path %}
+                        <div class="mt-3">
+                            <h4 class="text-center mb-2">Detection Results</h4>
+                            <div class="text-center">
+                                <img src="{{ detected_path }}" alt="Detected Image" class="img-fluid rounded shadow-sm">
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        {% if report_path %}
+                        <div class="text-center mt-3">
+                            <a href="{{ report_path }}" download class="btn btn-success w-100">
+                                <i class="fas fa-download me-1"></i>Download Report
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const preview = document.getElementById('preview');
+            const imagePreview = document.getElementById('imagePreview');
+            const removeFile = document.getElementById('removeFile');
+            const uploadForm = document.getElementById('uploadForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+
+            // Handle drag and drop
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-primary');
+            });
+
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('border-primary');
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-primary');
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    fileInput.files = files;
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            // Handle click to upload
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+
+            // Handle file selection
+            function handleFileSelect(file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        imagePreview.src = e.target.result;
+                        preview.classList.remove('d-none');
+                        dropZone.classList.add('d-none');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please upload an image file');
+                }
+            }
+
+            // Handle remove file
+            removeFile.addEventListener('click', () => {
+                fileInput.value = '';
+                preview.classList.add('d-none');
+                dropZone.classList.remove('d-none');
+            });
+
+            // Handle form submission
+            uploadForm.addEventListener('submit', () => {
+                submitBtn.disabled = true;
+                loading.classList.remove('d-none');
+            });
+
+            document.getElementById('uploadForm').addEventListener('submit', function(e) {
+                const fileInput = document.getElementById('fileInput');
+                if (!fileInput.files.length) {
+                    e.preventDefault();
+                    alert('Please select a file before submitting.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

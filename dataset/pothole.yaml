@@ -1,0 +1,6 @@
+train: pothole_detection_project/dataset/train/images
+val: pothole_detection_project/dataset/val/images
+
+
+nc: 2  # Number of classes (pothole + normal road)
+names: ['pothole', 'normal_road']
