@@ -6,7 +6,7 @@ services:
       pip install -r requirements.txt
       mkdir -p uploads reports static/detections
       wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt -O yolov8n.pt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 300 --workers 1 --threads 2
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.12
@@ -16,5 +16,8 @@ services:
         value: true
     healthCheckPath: /
     autoDeploy: true
-    plan: starter
+    plan: standard
+    scaling:
+      minInstances: 1
+      maxInstances: 1
 
