@@ -4,13 +4,17 @@ services:
     env: python
     buildCommand: |
       pip install -r requirements.txt
-      mkdir -p uploads reports models
+      mkdir -p uploads reports static/detections
       wget https://github.com/ultralytics/assets/releases/download/v0.0.0/yolov8n.pt -O yolov8n.pt
-    startCommand: gunicorn app:app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: 3.9.12
       - key: PORT
         value: 10000
+      - key: PYTHONUNBUFFERED
+        value: true
     healthCheckPath: /
     autoDeploy: true
+    plan: starter
+
