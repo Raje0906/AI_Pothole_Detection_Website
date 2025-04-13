@@ -4,13 +4,21 @@ from ultralytics import YOLO
 import os
 from datetime import datetime
 import numpy as np
+import os
+
+# Define relative path to the model
+model_path = os.path.join("runs", "detect", "train", "weights", "best.pt")
+
+# For more reliability, you can base it off the current file's location
+base_dir = os.path.dirname(os.path.abspath(__file__))
+model_path = os.path.join(base_dir, "runs", "detect", "train", "weights", "best.pt")
 
 # Load YOLOv8 model
 print("Starting model loading process...")
 try:
     # Load the trained model
     print("Loading trained model...")
-    model_path = r"C:\Users\Rajea\Downloads\copy 3\copy 3\pothole_detection_project\runs\detect\train\weights\best.pt"
+    model_path = "runs/detect/train/weights/best.pt"
     print(f"Looking for model at: {model_path}")
     if not os.path.exists(model_path):
         print(f"Error: Model file not found at {model_path}")
