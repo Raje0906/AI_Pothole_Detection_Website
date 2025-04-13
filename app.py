@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 import logging
 import os
+import os
+
+
 
 
 
@@ -19,7 +22,8 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')  # Required for session management
-
+port = int(os.environ.get("PORT", 5000))  # fallback for local
+app.run(host='0.0.0.0', port=port)
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
