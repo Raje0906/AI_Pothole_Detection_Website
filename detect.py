@@ -13,28 +13,43 @@ model_path = os.path.join("runs", "detect", "train", "weights", "best.pt")
 base_dir = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(base_dir, "runs", "detect", "train", "weights", "best.pt")
 
-# Load YOLOv8 model
-print("Starting model loading process...")
-try:
-    # Load the trained model
-    print("Loading trained model...")
-    model_path = "runs/detect/train/weights/best.pt"
-    print(f"Looking for model at: {model_path}")
-    if not os.path.exists(model_path):
-        print(f"Error: Model file not found at {model_path}")
-        raise FileNotFoundError(f"Model file not found at {model_path}")
+# Global model variable
+_model = None
+
+def load_model():
+    global _model
+    if _model is not None:
+        return _model
+
+    print("Starting model loading process...")
+    try:
+        # Try loading the trained model first
+        model_paths = [
+            "runs/detect/train/weights/best.pt",  # Local training path
+            "best.pt",                            # Root directory
+            "yolov8n.pt"                         # Fallback to pretrained
+        ]
         
-    model = YOLO(model_path)
-    print("Model loaded successfully!")
+        for model_path in model_paths:
+            if os.path.exists(model_path):
+                print(f"Loading model from: {model_path}")
+                _model = YOLO(model_path)
+                print("Model loaded successfully!")
+                
+                # Print model information
+                if hasattr(_model, 'names'):
+                    print(f"Model names: {_model.names}")
+                print(f"Model task: {_model.task if hasattr(_model, 'task') else 'detect'}")
+                return _model
+                
+        raise FileNotFoundError("No model file found in any of the expected locations")
+    except Exception as e:
+        print(f"Error loading model: {str(e)}")
+        raise
     
-    # Print model information
-    print("Model information:")
-    print(f"Model task: {model.task}")
-    print(f"Model names: {model.names}")
-    
-    # Store the class mapping for common objects
-    CLASS_NAMES = model.names
-    
+# Initialize model
+try:
+    model = load_model()
 except Exception as e:
     print(f"Error loading model: {str(e)}")
     raise e
@@ -48,6 +63,8 @@ def ensure_rgb(image):
     return image
 
 def detect_potholes(input_path, is_video=False):
+    # Get the model instance
+    model = load_model()
     """Detect potholes in images or videos."""
     print(f"Starting detection for file: {input_path}")
     
